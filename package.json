@@ -1,0 +1,13 @@
+{
+    "name": "slapchop",
+    "version": "0.0.1",
+    "dependencies": {
+        "async": "latest",
+        "colors": "latest",
+        "optimist": "latest",
+        "prompt": "latest",
+        "smartdc": "latest",
+        "ssh2": "latest",
+        "underscore": "latest"
+    }
+}
