@@ -2,6 +2,7 @@ var _ = require('underscore');
 var colors = require('colors');
 var prompt = require('prompt');
 var slapchop = require('./lib/api');
+var util = require('util');
 
 ///////////////////////
 // COMMAND-LINE ARGS //
@@ -24,6 +25,9 @@ var argv = require('optimist')
             .demand('d')
             .describe('d', 'The data-center to use')
             .alias('d', 'data-center')
+
+            .describe('f', 'The (comma-separated list) of node names to which to apply this action. To exclude one, prefix it with a "~"')
+            .alias('f', 'filter-names')
 
             .argv;
 
@@ -53,7 +57,8 @@ commands['list'] = function(cloudConfig, argv, callback) {
 
 commands['bootstrap'] = function(cloudConfig, argv, callback) {
     var opts = {'argv': argv};
-    var nodes = slapchop.buildLocalNodes(cloudConfig);
+    var nodes = _filterNames(slapchop.buildLocalNodes(cloudConfig), argv.f);
+
     slapchop.applyRemoteMachineInfo(nodes, opts, function(err) {
         if (err) {
             _logError('slapchop', 'Error applying remote machines:', err);
@@ -102,7 +107,7 @@ commands['bootstrap'] = function(cloudConfig, argv, callback) {
 
 commands['uptime'] = function(cloudConfig, argv, callback) {
     var opts = {'argv': argv};
-    var nodes = slapchop.buildLocalNodes(cloudConfig);
+    var nodes = _filterNames(slapchop.buildLocalNodes(cloudConfig), argv.f);
     slapchop.applyRemoteMachineInfo(nodes, opts, function(err) {
         if (err) {
             _logError('slapchop', 'Error applying remote machines:', err);
@@ -127,9 +132,127 @@ commands['uptime'] = function(cloudConfig, argv, callback) {
     });
 };
 
+commands['env'] = function(cloudConfig, argv, callback) {
+    var opts = {'argv': argv};
+    var nodes = _filterNames(slapchop.buildLocalNodes(cloudConfig), argv.f);
+    slapchop.applyRemoteMachineInfo(nodes, opts, function(err) {
+        if (err) {
+            _logError('slapchop', 'Error applying remote machines:', err);
+            return callback(err);
+        }
+
+        _.each(nodes, function(node, nodeName) {
+            console.log(util.format('export %s="%s"', _getEnvVarPublic(nodeName), _getPublicIp(node)));
+            console.log(util.format('export %s="%s"', _getEnvVarInternal(nodeName), _getInternalIp(node)));
+        });
+
+        return callback();
+    });
+};
+
+commands['create-provision-script'] = function(cloudConfig, argv, callback) {
+    var opts = {'argv': argv};
+    var nodes = _filterNames(slapchop.buildLocalNodes(cloudConfig), argv.f);
+    slapchop.applyRemoteMachineInfo(nodes, opts, function(err) {
+        if (err) {
+            _logError('slapchop', 'Error applying remote machines:', err);
+            return callback(err);
+        }
+
+        console.log('#!/bin/bash');
+        console.log('');
+
+        _.each(nodes, function(node, nodeName) {
+            console.log(util.format('%s="%s"', _getEnvVarPublic(nodeName), _getPublicIp(node)));
+            console.log(util.format('%s="%s"', _getEnvVarInternal(nodeName), _getInternalIp(node)));
+        });
+
+        console.log('');
+
+        _.each(nodes, function(node, nodeName) {
+            if (nodeName === 'puppet')
+                return;
+
+            var nodeVar = nodeName.replace(/-/g, '_');
+
+            console.log(util.format('ssh -oStrictHostKeyChecking=no root@$%s "curl https://raw.github.com/sakaiproject/puppet-hilary/master/provisioning/ubuntu.sh | bash -s performance %s $%s" &',
+                _getEnvVarPublic(nodeName), nodeName, _getEnvVarInternal('puppet')));
+        });
+
+        return callback();
+    });
+};
+
+commands['reboot'] = function(cloudConfig, argv, callback) {
+    var opts = {'argv': argv};
+    var nodes = _filterNames(slapchop.buildLocalNodes(cloudConfig), argv.f);
+    slapchop.applyRemoteMachineInfo(nodes, opts, function(err) {
+        if (err) {
+            _logError('slapchop', 'Error applying remote machines:', err);
+            return callback(err);
+        }
+
+        var nodesToShutdown = {};
+        var nodesToStartup = {};
+        _.each(nodes, function(node, nodeName) {
+            if (node.machine) {
+                nodesToStartup[nodeName] = node;
+                if (node.machine.state === 'running') {
+                    nodesToShutdown[nodeName] = node;
+                }
+            }
+        });
+
+        prompt.start();
+        prompt.get({
+            'name': 'shutdown',
+            'description': 'The following nodes will be shutdown: ' + JSON.stringify(_.keys(nodesToShutdown)) + '. Continue? (y / n)'
+        }, function(err, result) {
+            if (err) {
+                _logError('slapchop', 'Error accepting input:', err);
+                return callback(err);
+            } else if (result.shutdown !== 'y') {
+                slapchop.logStatus('slapchop', 'Aborting reboot process.');
+                return callback();
+            }
+
+
+            slapchop.shutdownMachines(nodesToShutdown, opts, function(err) {
+                if (err) {
+                    _logError('slapchop', 'Error shutting down machines:', err);
+                    return callback(err);
+                }
+
+                slapchop.whenStopped(nodesToStartup, opts, function(err) {
+                    if (err) {
+                        _logError('slapchop', 'Error polling for nodes to shut down:', err);
+                        return callback(err);
+                    }
+
+                    slapchop.startupMachines(nodesToStartup, opts, function(err) {
+                        if (err) {
+                            _logError('slapchop', 'Error starting up machines:', err);
+                            return callback(err);
+                        }
+
+                        slapchop.whenRunning(nodesToStartup, opts, function(err) {
+                            if (err) {
+                                _logError('slapchop', 'Error polling for nodes to start up:', err);
+                                return callback(err);
+                            }
+
+                            return callback();
+                        });
+                    });
+                });
+            });
+        });
+    });
+};
+
 commands['destroy'] = function(cloudConfig, argv, callback) {
     var opts = {'argv': argv};
-    var nodes = slapchop.buildLocalNodes(cloudConfig);
+    var nodes = _filterNames(slapchop.buildLocalNodes(cloudConfig), argv.f);
     slapchop.applyRemoteMachineInfo(nodes, opts, function(err) {
         if (err) {
             _logError('slapchop', 'Error applying remote machines:', err);
@@ -198,6 +321,37 @@ commands['destroy'] = function(cloudConfig, argv, callback) {
     });
 };
 
+var _filterNames = function(nodes, filterArg) {
+    if (!filterArg) {
+        return nodes;
+    }
+
+    var includes = [];
+    var excludes = [];
+    var filterNames = filterArg.split(',');
+    _.each(filterNames, function(filterName) {
+        if (filterName[0] === '~') {
+            excludes.push(filterName.slice(1));
+        } else {
+            includes.push(filterName);
+        }
+    });
+
+    var filteredNodes = _.extend({}, nodes);
+    if (includes.length > 0) {
+        filteredNodes = {};
+        _.each(includes, function(includeName) {
+            filteredNodes[includeName] = nodes[includeName];
+        });
+    }
+
+    _.each(excludes, function(excludeName) {
+        delete filteredNodes[excludeName];
+    });
+
+    return filteredNodes;
+};
+
 var _whenRunning = function(nodes, opts, callback) {
     slapchop.whenRunning(nodes, opts, function(err) {
         if (err) {
@@ -212,6 +366,32 @@ var _whenRunning = function(nodes, opts, callback) {
 var _logError = function(who, msg, err) {
     slapchop.logStatus(who, msg, 'red');
     slapchop.logStatus(who, JSON.stringify(err, null, 2), 'red');
+};
+
+var _getPublicIp = function(node) {
+    if (!node.machine) {
+        throw new Error('Node did not have a remote machine: ' + JSON.stringify(node, null, 4));
+    }
+
+    return node.machine.primaryIp;
+};
+
+var _getInternalIp = function(node) {
+    if (!node.machine) {
+        throw new Error('Node did not have a remote machine: ' + JSON.stringify(node, null, 4));
+    }
+
+    return (node.machine.ips[0] === node.machine.primaryIp) ? node.machine.ips[1] : node.machine.ips[0];
+};
+
+var _getEnvVarPublic = function(nodeName) {
+    var nodeVar = nodeName.replace(/-/g, '_');
+    return util.format('%s_%s', argv.a, nodeVar);
+};
+
+var _getEnvVarInternal = function(nodeName) {
+    var nodeVar = nodeName.replace(/-/g, '_');
+    return util.format('%s_%s_internal', argv.a, nodeVar);
 };
 
 if (argv.h !== undefined) {
