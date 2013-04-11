@@ -1,0 +1,77 @@
+{
+    "nodeTypes": {
+        "activity-cache": {
+            "system": {
+                "datasetUrn": "sdc:jpc:ubuntu-12.04:2.4.0",
+                "package": "Sakaigerproduction_4GB"
+            }
+        },
+        "cache": {
+            "system": {
+                "datasetUrn": "sdc:jpc:ubuntu-12.04:2.4.0",
+                "package": "Sakaigerproduction_512MB"
+            }
+        },
+        "app": {
+            "system": {
+                "datasetUrn": "sdc:jpc:ubuntu-12.04:2.4.0",
+                "package": "Sakaigerproduction_512MB"
+            }
+        },
+        "pp": {
+            "system": {
+                "datasetUrn": "sdc:jpc:ubuntu-12.04:2.4.0",
+                "package": "Sakaigerproduction_1GB"   
+            }
+        },
+        "db": {
+            "system": {
+                "datasetUrn": "sdc:jpc:ubuntu-12.04:2.4.0",
+                "package": "Sakaigerproduction_8GB"   
+            }
+        },
+        "mq": {
+            "system": {
+                "datasetUrn": "sdc:jpc:ubuntu-12.04:2.4.0",
+                "package": "Sakaigerproduction_512MB"   
+            }
+        },
+        "search": {
+            "system": {
+                "datasetUrn": "sdc:jpc:ubuntu-12.04:2.4.0",
+                "package": "Sakaigerproduction_4GB"   
+            }
+        },
+        "web": {
+            "system": {
+                "datasetUrn": "sdc:jpc:ubuntu-12.04:2.4.0",
+                "package": "Sakaigerproduction_1GB"
+            }
+        },
+        "puppet": {
+            "system": {
+                "datasetUrn": "sdc:jpc:ubuntu-12.04:2.4.0",
+                "package": "Sakaigerproduction_2GB"
+            }
+        },
+        "syslog": {
+            "system": {
+                "datasetUrn": "sdc:jpc:ubuntu-12.04:2.4.0",
+                "package": "Sakaigerproduction_512MB"
+            }
+        }
+    },
+    "nodes": {
+        "activity-cache-master": {"type": "activity-cache"},
+        "cache-master": {"type": "cache"},
+        "app0": {"type": "app"},
+        "activity0": {"type": "app"},
+        "pp0": {"type": "pp"},
+        "db0": {"type": "db"},
+        "mq-master": {"type": "mq"},
+        "search0": {"type": "search"},
+        "puppet": {"type": "puppet"},
+        "syslog": {"type": "syslog"},
+        "web0": {"type": "web"}
+    }
+}

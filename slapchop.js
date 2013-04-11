@@ -169,6 +169,21 @@ commands['create-provision-script'] = function(cloudConfig, argv, callback) {
 
         console.log('');
 
+        // For convenience, output the command to bootstrap the puppet server
+        console.log('# 1. First, run the before-reboot bootstrap script on the puppet master');
+        console.log(util.format('# ssh -oStrictHostKeyChecking=no root@%s "curl https://raw.github.com/sakaiproject/puppet-hilary/master/provisioning/puppetmaster-beforereboot.sh | bash"', _getPublicIp(nodes['puppet'])));
+
+        console.log('');
+        console.log('# 2. Reboot the puppet machine. You can do that with a command like this:');
+        console.log('# node slapchop.js -a sakaiger -d eu-ams-1 -f puppet reboot');
+
+        console.log('');
+        console.log('# 3. Then you need to do the after-reboot bootstrap script, which actually installs things. Hooray!');
+        console.log(util.format('# ssh -oStrictHostKeyChecking=no root@$%s "curl https://raw.github.com/sakaiproject/puppet-hilary/master/provisioning/puppetmaster-afterreboot.sh | bash"', _getPublicIp(nodes['puppet'])));
+
+        console.log('');
+        console.log('# Now you can actually run the following stuff to bootstrap the other nodes:');
+
         _.each(nodes, function(node, nodeName) {
             if (nodeName === 'puppet')
                 return;
