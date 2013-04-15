@@ -64,6 +64,7 @@
     "nodes": {
         "activity-cache-master": {"type": "activity-cache"},
         "cache-master": {"type": "cache"},
+        "cache-slave": {"type": "cache"},
         "app0": {"type": "app"},
         "activity0": {"type": "app"},
         "pp0": {"type": "pp"},

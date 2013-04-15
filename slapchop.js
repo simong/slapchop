@@ -15,8 +15,9 @@ var argv = require('optimist')
             .describe('h', 'Show this help dialogue')
             .alias('h', 'help')
 
+            .demand('e')
             .describe('e', 'The location of the environment descriptor.')
-            .alias('e', 'environment')['default']('e', 'env.json')
+            .alias('e', 'environment')
 
             .demand('a')
             .describe('a', 'The account you would like to use')
