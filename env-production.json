@@ -59,6 +59,12 @@
                 "datasetUrn": "sdc:jpc:ubuntu-12.04:2.4.0",
                 "package": "Sakaigerproduction_512MB"
             }
+        },
+        "proxy": {
+            "system": {
+                "datasetUrn": "sdc:jpc:ubuntu-12.04:2.4.0",
+                "package": "Sakaigerproduction_512MB"
+            }
         }
     },
     "nodes": {
@@ -73,6 +79,7 @@
         "search0": {"type": "search"},
         "puppet": {"type": "puppet"},
         "syslog": {"type": "syslog"},
-        "web0": {"type": "web"}
+        "web0": {"type": "web"},
+        "proxy0": {"type": "proxy"}
     }
 }
