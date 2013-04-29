@@ -176,11 +176,11 @@ commands['create-provision-script'] = function(cloudConfig, argv, callback) {
 
         console.log('');
         console.log('# 2. Reboot the puppet machine. You can do that with a command like this:');
-        console.log('# node slapchop.js -a sakaiger -d eu-ams-1 -f puppet reboot');
+        console.log('# node slapchop.js -a %s -d %s -e %s -f puppet reboot', argv.a, argv.d, argv.e);
 
         console.log('');
         console.log('# 3. Then you need to do the after-reboot bootstrap script, which actually installs things. Hooray!');
-        console.log(util.format('# ssh -oStrictHostKeyChecking=no root@$%s "curl https://raw.github.com/sakaiproject/puppet-hilary/master/provisioning/puppetmaster-afterreboot.sh | bash"', _getPublicIp(nodes['puppet'])));
+        console.log(util.format('# ssh -oStrictHostKeyChecking=no root@%s "curl https://raw.github.com/sakaiproject/puppet-hilary/master/provisioning/puppetmaster-afterreboot.sh | bash -s %s"', _getPublicIp(nodes['puppet']), cloudConfig.name));
 
         console.log('');
         console.log('# Now you can actually run the following stuff to bootstrap the other nodes:');
@@ -191,8 +191,8 @@ commands['create-provision-script'] = function(cloudConfig, argv, callback) {
 
             var nodeVar = nodeName.replace(/-/g, '_');
 
-            console.log(util.format('ssh -oStrictHostKeyChecking=no root@$%s "curl https://raw.github.com/sakaiproject/puppet-hilary/master/provisioning/ubuntu.sh | bash -s performance %s $%s" &',
-                _getEnvVarPublic(nodeName), nodeName, _getEnvVarInternal('puppet')));
+            console.log(util.format('ssh -oStrictHostKeyChecking=no root@$%s "curl https://raw.github.com/sakaiproject/puppet-hilary/master/provisioning/ubuntu.sh | bash -s %s %s $%s" &',
+                _getEnvVarPublic(nodeName), cloudConfig.name, nodeName, _getEnvVarInternal('puppet')));
         });
 
         return callback();

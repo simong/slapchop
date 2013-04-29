@@ -1,5 +1,5 @@
 {
-    "name": "production",
+    "name": "staging",
     "nodeTypes": {
         "activity-cache": {
             "system": {
@@ -75,23 +75,14 @@
         }
     },
     "nodes": {
-        "activity-cache0": {"type": "activity-cache"},
-        "activity-cache1": {"type": "activity-cache"},
         "cache0": {"type": "cache"},
-        "cache1": {"type": "cache"},
         "app0": {"type": "app"},
-        "activity0": {"type": "app"},
-        "pp0": {"type": "pp"},
         "db0": {"type": "db"},
         "mq0": {"type": "mq"},
-        "mq1": {"type": "mq"},
         "search0": {"type": "search"},
         "puppet": {"type": "puppet"},
         "syslog": {"type": "syslog"},
         "web0": {"type": "web"},
-        "proxy0": {"type": "proxy"},
-        "etherpad0": {"type": "etherpad"},
-        "etherpad1": {"type": "etherpad"},
-        "etherpad2": {"type": "etherpad"}
+        "proxy0": {"type": "proxy"}
     }
 }

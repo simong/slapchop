@@ -1,4 +1,5 @@
 {
+    "name": "performance",
     "nodeTypes": {
         "activity-cache": {
             "system": {

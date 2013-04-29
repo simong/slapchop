@@ -1,0 +1,21 @@
+{
+    "name": "qa",
+    "nodeTypes": {
+        "qa": {
+            "system": {
+                "datasetUrn": "sdc:jpc:ubuntu-12.04:2.4.0",
+                "package": "Sakaiger_4GB"
+            }
+        },
+        "puppet": {
+            "system": {
+                "datasetUrn": "sdc:jpc:ubuntu-12.04:2.4.0",
+                "package": "Sakaiger_2GB"
+            }
+        }
+    },
+    "nodes": {
+        "qa0": {"type": "qa"},
+        "puppet": {"type": "puppet"}
+    }
+}
