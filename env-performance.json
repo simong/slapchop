@@ -22,25 +22,25 @@
         "pp": {
             "system": {
                 "datasetUrn": "sdc:jpc:ubuntu-12.04:2.4.0",
-                "package": "Small 1GB"   
+                "package": "Small 1GB"
             }
         },
         "db": {
             "system": {
                 "datasetUrn": "sdc:jpc:ubuntu-12.04:2.4.0",
-                "package": "Large 8GB"   
+                "package": "Large 8GB"
             }
         },
         "mq": {
             "system": {
                 "datasetUrn": "sdc:jpc:ubuntu-12.04:2.4.0",
-                "package": "Extra Small 512 MB"   
+                "package": "Extra Small 512 MB"
             }
         },
         "search": {
             "system": {
                 "datasetUrn": "sdc:jpc:ubuntu-12.04:2.4.0",
-                "package": "Medium 4GB"   
+                "package": "Medium 4GB"
             }
         },
         "web": {
@@ -63,25 +63,16 @@
         }
     },
     "nodes": {
-        "activity-cache-master": {"type": "activity-cache"},
-        "cache-master": {"type": "cache"},
-        "app0": {"type": "app"},
-        "app1": {"type": "app"},
-        "app2": {"type": "app"},
-        "app3": {"type": "app"},
         "activity0": {"type": "app"},
-        "activity1": {"type": "app"},
-        "activity2": {"type": "app"},
-        "pp0": {"type": "pp"},
-        "pp1": {"type": "pp"},
-        "pp2": {"type": "pp"},
+        "app0": {"type": "app"},
+        "cache0": {"type": "cache"},
         "db0": {"type": "db"},
-        "db1": {"type": "db"},
-        "db2": {"type": "db"},
-        "mq-master": {"type": "mq"},
-        "search0": {"type": "search"},
-        "search1": {"type": "search"},
+        "etherpad0": {"type": "app"},
+        "mq0": {"type": "mq"},
+        "pp0": {"type": "pp"},
         "puppet": {"type": "puppet"},
+        "search0": {"type": "search"},
+        "syslog": {"type": "syslog"},
         "web0": {"type": "web"}
     }
 }
